@@ -1,0 +1,6 @@
+@entra_auth_lab.Api_HostAddress = http://localhost:5097
+
+GET {{entra_auth_lab.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
