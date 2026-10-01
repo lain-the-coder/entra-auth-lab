@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IUserRepo, UserRepo>();
-builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -16,6 +14,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
                 .EnableSensitiveDataLogging();
     }
 });
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
