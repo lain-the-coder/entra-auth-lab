@@ -1,8 +1,11 @@
 using entra_auth_lab.Api.Data;
+using entra_auth_lab.Api.Interfaces;
+using entra_auth_lab.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -13,7 +16,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
                 .EnableSensitiveDataLogging();
     }
 });
-
 
 var app = builder.Build();
 
