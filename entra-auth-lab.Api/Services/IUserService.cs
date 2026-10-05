@@ -8,6 +8,6 @@ namespace entra_auth_lab.Api.Services
         Task<UserDto> GetByExternalIdAsync(Guid externalId);
         Task<List<UserDto>> GetAsync();
         Task<UserDto> CreateAsync(CreateUserRequest user);
-        Task UpdateAsync(CreateUserRequest user);
+        Task UpdateAsync(int id, CreateUserRequest user);
     }
 }
