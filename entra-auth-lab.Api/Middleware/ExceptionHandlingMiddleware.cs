@@ -1,5 +1,6 @@
+using entra_auth_lab.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using MiniShop.Api.Services;
+using System.Text.Json;
 
 namespace entra_auth_lab.Api.Middleware
 {
@@ -34,10 +35,15 @@ namespace entra_auth_lab.Api.Middleware
                     "Not Found",
                     notFound.Message
                 ),
-                MiniShop.Api.Services.ValidationException validation => (
+                ValidationException validation => (
                     StatusCodes.Status400BadRequest,
                     "Validation Failed",
                     validation.Message
+                ),
+                ConflictException conflict => (
+                    StatusCodes.Status409Conflict,
+                    "Conflict",
+                    conflict.Message
                 ),
                 _ => (
                     StatusCodes.Status500InternalServerError,
@@ -67,9 +73,8 @@ namespace entra_auth_lab.Api.Middleware
 
             // 4. Write HTTP response
             context.Response.StatusCode = status;
-            context.Response.ContentType = "application/problem+json";
 
-            await context.Response.WriteAsJsonAsync(problem);
+            await context.Response.WriteAsJsonAsync(problem, (JsonSerializerOptions?)null, "application/problem+json");
         }
     }
 }

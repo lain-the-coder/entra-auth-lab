@@ -1,7 +1,8 @@
 using entra_auth_lab.Api.Dtos;
 using entra_auth_lab.Api.Entities;
 using entra_auth_lab.Api.Interfaces;
-using MiniShop.Api.Services;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace entra_auth_lab.Api.Services
 {
@@ -57,14 +58,28 @@ namespace entra_auth_lab.Api.Services
         }
         public async Task<UserDto> CreateAsync(CreateUserRequest user)
         {
+            // in case client sends explicit all-zeros GUID
+            if (user.ExternalId!.Value == Guid.Empty)
+            {
+                throw new ValidationException("ExternalId is required.");
+            }
             var row = new User
             {
-                ExternalId = user.ExternalId,
+                ExternalId = user.ExternalId!.Value,
                 Email = user.Email,
                 DisplayName = user.DisplayName
             };
             uow.Users.Add(row);
-            await uow.SaveChangesAsync();
+            uow.Users.Add(row);
+            try
+            {
+                await uow.SaveChangesAsync();
+            }
+            // concurrency safe for index issues
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 2601 or 2627 })
+            {
+                throw new ConflictException($"A user with ExternalId {user.ExternalId} already exists.");
+            }
             var createdUser = new UserDto
             {
                 Id = row.Id,
@@ -74,14 +89,13 @@ namespace entra_auth_lab.Api.Services
             };
             return createdUser;
         }
-        public async Task UpdateAsync(int id, CreateUserRequest user)
+        public async Task UpdateAsync(int id, UpdateUserRequest user)
         {
             var row = await uow.Users.GetByIdAsync(id);
             if (row == null)
             {
                 throw new NotFoundException($"User with ID {id} was not found.");
             }
-            row.ExternalId = user.ExternalId;
             row.Email = user.Email;
             row.DisplayName = user.DisplayName;
             await uow.SaveChangesAsync();

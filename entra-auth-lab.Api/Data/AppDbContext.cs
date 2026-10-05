@@ -41,8 +41,7 @@ namespace entra_auth_lab.Api.Data
             var currentTime = DateTime.UtcNow;
             // Find every entity tracked by EF Core that implements IAuditable
             var entries = ChangeTracker.Entries()
-                .Where(e => e.Entity is IAuditable &&
-                           (e.State == EntityState.Added || e.State == EntityState.Modified));
+                .Where(e => e.Entity is IAuditable && e.State == EntityState.Added);
             foreach (var entry in entries)
             {
                 var auditable = (IAuditable)entry.Entity;

@@ -6,7 +6,7 @@ namespace entra_auth_lab.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController(IUserService userService) : ControllerBase
+    public class UsersController(IUserService userService) : ControllerBase
     {
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserDto>> GetById(int id)
@@ -33,7 +33,7 @@ namespace entra_auth_lab.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
         }
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<UserDto>> Update(int id, [FromBody] CreateUserRequest user)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest user)
         {
             await userService.UpdateAsync(id, user);
             return NoContent();
