@@ -1,6 +1,8 @@
 using entra_auth_lab.Api.Data;
 using entra_auth_lab.Api.Interfaces;
+using entra_auth_lab.Api.Middleware;
 using entra_auth_lab.Api.Repositories;
+using entra_auth_lab.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,9 +17,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
 });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
